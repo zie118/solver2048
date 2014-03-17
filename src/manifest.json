@@ -5,11 +5,12 @@
     "description": "Solve 2048",
 
     "permissions": [
-        "tabs"
+        "tabs",
+        "http://gabrielecirulli.github.io/2048/"
     ],
 
     "background": {
-        "scripts": ["background.js"]
+        "scripts": ["js/background.js"]
     },
 
     "browser_action": {     
@@ -18,8 +19,8 @@
 
     "content_scripts": [
         {
-            "matches": ["http://*/*"],
-            "js": ["jquery.js", "content.js"]
+            "matches": ["http://gabrielecirulli.github.io/2048/*"],
+            "js": ["js/jquery.js", "js/content.js"]
         }
     ]
 }
