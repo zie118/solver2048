@@ -5,6 +5,10 @@ function test() {
     });
 }
 
+function sendMessage(data, callback) {
+    chrome.extension.sendMessage(data, callback);
+}
+
 function initialize() {
     console.log("call init");
     $('#testb').click(test);
