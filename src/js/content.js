@@ -16,12 +16,12 @@ function GetCurrentConfig() {
             });
         }
     }
-    console.log(ret);
     return ret
 }
 
 /* Trigger a move with dir 0:A 1:S 2:D 3:W */
 function TriggerMove(dir) {
+    console.log(dir);
     var elem = document.body;
     console.log(elem);
     var charCode = 65;
@@ -32,7 +32,6 @@ function TriggerMove(dir) {
         case 2: charCode = 68; break;
         case 3: charCode = 87; break;
     };  
-
     triggerKeyEvent(elem, charCode);
 }
 
@@ -63,21 +62,26 @@ function triggerKeyEvent(element, charCode) {
 
 function ListenerMethod(request, sender, callback)
 {
-    if (request.greeting == 'hello') {
-        /*
-        $.each($('div[class*="tile-position-4-1"]'), function(index, value) {
-            console.log(index);
-            console.log($('.tile-inner', value).text());
-            console.log($(value).hasClass('new'));
-        });
-        */
-        TriggerMove(3);
-        GetCurrentConfig();
-        callback("YES");
-    }
-    if (request.method && request.method == 'GET_BOX') {
-        var boxArr = GetCurrentConfig();
-        callback(boxArr);
+    if (request.method) {
+        switch (request.method) {
+            case 'GET_BOX':
+                var boxArr = GetCurrentConfig();
+                console.log(boxArr);
+                callback(boxArr);
+                break;
+            case 'MOVE_UP':
+                TriggerMove(3); 
+                break;
+            case 'MOVE_DOWN':
+                TriggerMove(1); 
+                break;
+            case 'MOVE_LEFT':
+                TriggerMove(0); 
+                break;
+            case 'MOVE_RIGHT':
+                TriggerMove(2); 
+                break;
+        }
     }
 }
 
