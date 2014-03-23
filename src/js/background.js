@@ -1,6 +1,6 @@
 /* GLOBAL VARIABLES */
 var GLB_MOVE_DIR = new Array("MOVE_LEFT", "MOVE_DOWN", "MOVE_RIGHT", "MOVE_UP");
-var GLB_LOOK_AHEAD = 2;
+var GLB_LOOK_AHEAD = 6;
 var GLB_FIRST_MOVE = 0;
 
 /* count empty block */
@@ -142,28 +142,63 @@ function validMove(boxArr, dir) {
 
 /* Measure disconnectness */
 function evaluateConfig(curBoxArr) {
-    var dis = 0;
-    for (var r = 0; r < 4; r++)
-        for (var c = 0; c < 3; c++) 
-            dis += Math.abs(curBoxArr[r][c]-curBoxArr[r][c+1]);
-    for (var c = 0; c < 4; c++)
-        for (var r = 0; r < 3; r++) 
-            dis += Math.abs(curBoxArr[r][c]-curBoxArr[r+1][c]);
 
-    var free = emptyBlock(curBoxArr);
-    return free*free-dis;
+	/* Connectivity */
+	var sortedBoxList = [];
+	for (var i = 0; i < 4; i++)
+		sortedBoxList = sortedBoxList.concat(curBoxArr[i]);
+	sortedBoxList.sort(function(a,b) {return a-b});
+	var sortedBoxArr = [];
+	while (sortedBoxList.length) sortedBoxArr.push(sortedBoxList.splice(0,4));
+
+    var dis = 0, mdis = 0;
+    for (var r = 0; r < 4; r++)
+        for (var c = 0; c < 3; c++) {
+            dis += Math.abs(curBoxArr[r][c]-curBoxArr[r][c+1]);
+            mdis += Math.abs(sortedBoxArr[r][c]-sortedBoxArr[r][c+1]);
+		}
+    for (var c = 0; c < 4; c++)
+        for (var r = 0; r < 3; r++) {
+            dis += Math.abs(curBoxArr[r][c]-curBoxArr[r+1][c]);
+            mdis += Math.abs(sortedBoxArr[r][c]-sortedBoxArr[r+1][c]);
+		}
+	var conn = mdis / dis;
+
+	/* Free Block */
+    var free = emptyBlock(curBoxArr) / 16.0;
+
+	/* Monotonic */
+	var cnt = 0;
+	for (var r = 0; r < 4; r++) {
+		var less = false, great = false;
+        for (var c = 0; c < 3; c++) {
+			if (curBoxArr[r][c] < curBoxArr[r][c+1]) less = true;
+			if (curBoxArr[r][c] > curBoxArr[r][c+1]) great = true;
+		}
+		if (!less || !great) cnt++;
+	}
+    for (var c = 0; c < 4; c++) {
+		var less = false, great = false;
+        for (var r = 0; r < 3; r++) {
+			if (curBoxArr[r][c] < curBoxArr[r+1][c]) less = true;
+			if (curBoxArr[r][c] > curBoxArr[r+1][c]) great = true;
+		}
+		if (!less || !great) cnt++;
+	}
+	var mono = cnt / 8.0;
+    return conn + free + mono;
 }
 
 /* alpha-beta pruning */
 function alphabeta(curBoxArr, depth, alpha, beta, maximizingPlayer) {
-    console.log('curdepth = ' + depth);
-    console.log("\n"+curBoxArr[0][0]+curBoxArr[0][1]+curBoxArr[0][2]+curBoxArr[0][3]+"\n"+
-                curBoxArr[1][0]+curBoxArr[1][1]+curBoxArr[1][2]+curBoxArr[1][3]+"\n"+
-                curBoxArr[2][0]+curBoxArr[2][1]+curBoxArr[2][2]+curBoxArr[2][3]+"\n"+
-                curBoxArr[3][0]+curBoxArr[3][1]+curBoxArr[3][2]+curBoxArr[3][3]+"\n");
+    //console.log('curdepth = ' + depth);
+    //console.log("\n"+curBoxArr[0][0]+curBoxArr[0][1]+curBoxArr[0][2]+curBoxArr[0][3]+"\n"+
+    //            curBoxArr[1][0]+curBoxArr[1][1]+curBoxArr[1][2]+curBoxArr[1][3]+"\n"+
+    //            curBoxArr[2][0]+curBoxArr[2][1]+curBoxArr[2][2]+curBoxArr[2][3]+"\n"+
+    //            curBoxArr[3][0]+curBoxArr[3][1]+curBoxArr[3][2]+curBoxArr[3][3]+"\n");
     if (depth == 0) {
         var retv = evaluateConfig(curBoxArr);
-        console.log('reach leaf with value = '+retv);
+        //console.log('reach leaf with value = '+retv);
         return retv;
     }
     if (maximizingPlayer) {
@@ -210,7 +245,7 @@ function minmax(boxArr) {
 
 /* What to do when get box arr back */
 function GetBoxCallback(boxArr) {
-    console.log(boxArr);
+    //console.log(boxArr);
 
     /* Just Random */
     //chrome.tabs.getSelected(null, function(tab) {
@@ -228,17 +263,17 @@ function unitTest() {
     for (var i = 0; i < 4; i++)
         testArr[i] = new Array(0,2,4,2);
 
-    console.log("\n"+testArr[0][0]+testArr[0][1]+testArr[0][2]+testArr[0][3]+"\n"+
-                testArr[1][0]+testArr[1][1]+testArr[1][2]+testArr[1][3]+"\n"+
-                testArr[2][0]+testArr[2][1]+testArr[2][2]+testArr[2][3]+"\n"+
-                testArr[3][0]+testArr[3][1]+testArr[3][2]+testArr[3][3]+"\n");
+    //console.log("\n"+testArr[0][0]+testArr[0][1]+testArr[0][2]+testArr[0][3]+"\n"+
+    //            testArr[1][0]+testArr[1][1]+testArr[1][2]+testArr[1][3]+"\n"+
+    //            testArr[2][0]+testArr[2][1]+testArr[2][2]+testArr[2][3]+"\n"+
+    //            testArr[3][0]+testArr[3][1]+testArr[3][2]+testArr[3][3]+"\n");
 
     for (var i = 0; i < 4; i++) {
         var ret = doMove(testArr, i);
-        console.log("\n"+ret[0][0]+ret[0][1]+ret[0][2]+ret[0][3]+"\n"+
-                ret[1][0]+ret[1][1]+ret[1][2]+ret[1][3]+"\n"+
-                ret[2][0]+ret[2][1]+ret[2][2]+ret[2][3]+"\n"+
-                ret[3][0]+ret[3][1]+ret[3][2]+ret[3][3]+"\n");
+        //console.log("\n"+ret[0][0]+ret[0][1]+ret[0][2]+ret[0][3]+"\n"+
+        //        ret[1][0]+ret[1][1]+ret[1][2]+ret[1][3]+"\n"+
+        //        ret[2][0]+ret[2][1]+ret[2][2]+ret[2][3]+"\n"+
+        //        ret[3][0]+ret[3][1]+ret[3][2]+ret[3][3]+"\n");
     }
 }
 
@@ -246,7 +281,7 @@ function unitTest() {
 chrome.extension.onMessage.addListener(function(message, sender, callback){
     if(message.method && message.method == 'move') {
 
-        console.log("Move Requset Received.");
+        //console.log("Move Requset Received.");
 
         /* STEP 1: Send Message to content.js for current config */
         chrome.tabs.getSelected(null, function(tab) {

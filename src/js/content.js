@@ -21,9 +21,9 @@ function GetCurrentConfig() {
 
 /* Trigger a move with dir 0:A 1:S 2:D 3:W */
 function TriggerMove(dir) {
-    console.log(dir);
+    //console.log(dir);
     var elem = document.body;
-    console.log(elem);
+    //console.log(elem);
     var charCode = 65;
 
     switch (dir) {
@@ -66,7 +66,7 @@ function ListenerMethod(request, sender, callback)
         switch (request.method) {
             case 'GET_BOX':
                 var boxArr = GetCurrentConfig();
-                console.log(boxArr);
+                //console.log(boxArr);
                 callback(boxArr);
                 break;
             case 'MOVE_UP':

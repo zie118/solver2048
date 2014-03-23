@@ -1,8 +1,6 @@
 function run() {
     console.log("call run");
-    chrome.extension.sendMessage({method:'move'}, function(response){
-        $('.output').text(response);
-    });
+    chrome.extension.sendMessage({method:'move'});
 }
 
 function initialize() {
