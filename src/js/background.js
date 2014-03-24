@@ -192,11 +192,6 @@ function evaluateConfig(curBoxArr) {
 
 /* alpha-beta pruning */
 function alphabeta(curBoxArr, depth, alpha, beta, maximizingPlayer) {
-    //console.log('curdepth = ' + depth);
-    //console.log("\n"+curBoxArr[0][0]+curBoxArr[0][1]+curBoxArr[0][2]+curBoxArr[0][3]+"\n"+
-    //            curBoxArr[1][0]+curBoxArr[1][1]+curBoxArr[1][2]+curBoxArr[1][3]+"\n"+
-    //            curBoxArr[2][0]+curBoxArr[2][1]+curBoxArr[2][2]+curBoxArr[2][3]+"\n"+
-    //            curBoxArr[3][0]+curBoxArr[3][1]+curBoxArr[3][2]+curBoxArr[3][3]+"\n");
     if (depth == 0) {
         var retv = evaluateConfig(curBoxArr);
         //console.log('reach leaf with value = '+retv);
@@ -247,11 +242,6 @@ function minmax(boxArr) {
 /* What to do when get box arr back */
 function GetBoxCallback(boxArr) {
     //console.log(boxArr);
-
-    /* Just Random */
-    //chrome.tabs.getSelected(null, function(tab) {
-    //    chrome.tabs.sendMessage(tab.id, {method: GLB_MOVE_DIR[Math.floor(Math.random()*4)]}, GetBoxCallback);
-    //});
 
     /* Minmax */
     chrome.tabs.getSelected(null, function(tab) {
