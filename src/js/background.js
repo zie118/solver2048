@@ -190,11 +190,18 @@ function evaluateConfig(curBoxArr) {
     return conn + free + mono;
 }
 
+/* Judge whether there is any valid move */
+function dead(boxArr) {
+	for (var dir = 0; dir < 4; dir++) {
+		if (validMove(boxArr, dir)) return false;
+	}
+	return true;
+}
+
 /* alpha-beta pruning */
 function alphabeta(curBoxArr, depth, alpha, beta, maximizingPlayer) {
-    if (depth == 0) {
+    if (depth == 0 || dead(curBoxArr)) {
         var retv = evaluateConfig(curBoxArr);
-        //console.log('reach leaf with value = '+retv);
         return retv;
     }
     if (maximizingPlayer) {
@@ -242,10 +249,9 @@ function minmax(boxArr) {
 /* What to do when get box arr back */
 function GetBoxCallback(boxArr) {
     //console.log(boxArr);
-
     /* Minmax */
     chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendMessage(tab.id, {method: minmax(boxArr)}, GetBoxCallback);
+        chrome.tabs.sendMessage(tab.id, {method: minmax(boxArr)}, null);
     });
 }
 
