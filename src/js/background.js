@@ -2,6 +2,7 @@
 var GLB_MOVE_DIR = new Array("MOVE_LEFT", "MOVE_DOWN", "MOVE_RIGHT", "MOVE_UP");
 var GLB_LOOK_AHEAD = 6;
 var GLB_FIRST_MOVE = 0;
+var GLB_MAIN_LOOP = -1;
 
 /* count empty block */
 function emptyBlock(boxArr) {
@@ -277,16 +278,21 @@ function unitTest() {
     }
 }
 
+function mainloop() {
+    chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendMessage(tab.id, {method: "GET_BOX"}, GetBoxCallback);
+    });
+}
+
 /* MAIN */
 chrome.extension.onMessage.addListener(function(message, sender, callback){
     if(message.method && message.method == 'move') {
-
-        //console.log("Move Requset Received.");
-
-        /* STEP 1: Send Message to content.js for current config */
-        chrome.tabs.getSelected(null, function(tab) {
-            chrome.tabs.sendMessage(tab.id, {method: "GET_BOX"}, GetBoxCallback);
-        });
+        console.log("Move Requset Received.");
+        GLB_MAIN_LOOP = setInterval(mainloop, 200);
+    }
+    if(message.method && message.method == 'stop') {
+        console.log("Stop Requset Received.");
+        clearInterval(GLB_MAIN_LOOP);
     }
 });
 
